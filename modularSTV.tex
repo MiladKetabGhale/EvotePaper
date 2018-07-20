@@ -42,7 +42,9 @@ approach by means of real-world case studies.
  Single Transferable Vote (STV) is a family of 
  vote counting schemes where voters express their 
  preferences for competing candidates by ranking them on a ballot
- paper. STV is used, directly or indirectly, in many 
+ paper. STV is used
+%directly or indirectly, 
+in many 
  countries including Ireland, Malta, India, Nepal, New Zealand and
  Australia. It is also used to elect moderators in the
  StackExchange discussion forum~\cite{StackExchange:2018:ME} and the
@@ -52,14 +54,14 @@ approach by means of real-world case studies.
  dependent on the number of ballots cast (often the Droop quota
  \cite{Droop:1881:MER}) and then proceeds as follows:
  \begin{enumerate}
- \item Count all first preferences on ballot papers.
- \item Elect all candidates whose first preferences are over the
- quota.
- \item Surplus votes, i.e. votes of elected candidates beyond and
- over the quota are transferred to the next preference
+ \item Count all first preferences on ballot papers;
+ \item Elect all candidates whose first preferences meet or exceed the
+ quota;
+ \item Transfer surplus votes, i.e. votes of elected candidates beyond and
+ over the quota are transferred to the next preference;
  \item If all transfers are concluded and there are still vacant
- seats, the least preferred candidate is eliminated, and their votes
- are transferred to the next preference.
+ seats, eliminate the least preferred candidate, and transfer his/her  votes
+ to the next preference.
  \end{enumerate}
 
 \noindent
@@ -70,30 +72,36 @@ Indeed, many jurisdictions differ in precisely that detail and
 stipulate a different subset of ballots be transferred, typically at
 a fractional weight (the so-called \emph{transfer value}). 
 For example, in the Australian Capital Territory (ACT) lower house
-election scheme, only the 
+STV election scheme, only the 
 \emph{last parcel} of an elected candidate (the ballots attributed
 to the candidate at the last
 count)  of an elected candidate is transferred. In
-contrast, the variant of STV used to elect the upper house in the
-Australian state of Vivtoria transfer \emph{all} ballots (at a
+contrast, the STV variant used in the upper house of the
+Australian state of Victoria transfers \emph{all} ballots (at a
 reduced transfer value). Similar differences also exist for the
-transfer of votes once a candidate is being eliminated. 
+transfer of votes when a candidate is being eliminated. 
 
 On the other hand, all variants of STV share a large set of
 similarities. All use the same mechanism (transfer, count, elect,
 eliminate) to progress the count
 and, 
-for example, all protocols state that scrutiny shall cease once all
+for example, all 
+%protocols  state that scrutiny shall 
+cease counting once all
 vacancies are filled. 
 %
 In this paper, we abstract the commonalities of all different
 flavours of STV into a set of minimal requirements that we
 (consequently) call 
-\emph{minimal} STV. It comprises:
+\emph{minimal} STV. It consists of:
 \begin{itemize}
 \item the data (structure) that captures all states of the count
-\item the requirements that count, elect, eliminate, transfer (and
-three others) have to obey
+\item the requirements that these common elements, and three
+  other, must obey.
+% \item the requirements that count, elect, eliminate, transfer, and
+% three others, 
+% %have to 
+% must obey
 \end{itemize}
 \noindent
 In particular, we formally understand each single
@@ -102,69 +110,81 @@ which comprises some data. Based on the kind of data that such an
 object encapsulates, we separate them into three sets: initial
 states (all ballots uncounted), final states
 (election winners are declared) and intermediate states. The latter
-carry
-seven pieces of information: the list of uncounted ballots left to
-be dealt with currently, the tally of each candidate, the
-pile of ballots which had been counted in their favour, and four
-lists which specify the list of elected candidates whose votes await
-being transferred, the list of eliminated candidates whose votes is
-to be transferred, and the list of elected and continuing
-candidates. Basically, they record the state of computation up to the
-current stage. 
+carry seven pieces of information: 
+the list of remaining uncounted ballots which must be dealt with;
+the current tally of each candidate; 
+the pile of ballots counted in each candidate's favour;
+the list of elected candidates whose votes await transfer;
+the list of eliminated candidates whose votes await transfer;
+the list of elected candidates; 
+and the list of continuing candidates. 
+Basically, they record the current state of the tally computation.
 
-We realise transitions between states, which correspond to acts of counting,
-eliminating, transferring, electing, and declaring winners committed
-by tally officers, as formal rules that relate a pre-state and a
+We realise transitions between states, corresponding to acts of counting,
+eliminating, transferring, electing, and declaring winners,
+% committed by tally officers, 
+as formal rules that relate a pre-state and a
 post-state. These rules are what varies between different flavours
-of STV. As a consequence, minimal STV does not define the rules, but
-rather postulates minimal \emph{conditions} that every rule needs to
-satisfy. An \emph{instance} of STV is then given by
+of STV,
+so
+%As a consequence, 
+minimal STV does not define them.
+%rules, but
+Instead, it
+%rather 
+postulates minimal \emph{conditions} that each rule must
+satisfy. An \emph{instance} of STV is then given by:
 \begin{enumerate}
-\item the \emph{definition} of the rules for counting, electing,
-eliminating, and transfer
+\item \emph{definitions} of the rules for counting, electing,
+eliminating, and transferring;
 \item formal \emph{proofs} that the rules satisfy the respective
-conditions
+conditions.
 \end{enumerate}
 
 \noindent
-We sometimes refer to the conditions that the various rules have to
-satisfy, somewhat informally, as \emph{sanity checks}. They are the
-formal counterpart of the  legislation that inform counting officers
-which action to perform, and when. 
-The sanity check for each rule has two parts: the
-\emph{applicability condition} specifies under what conditions the
-rule can be applied (for example, the count rule can only be applied
-if there are uncounted ballots). The \emph{progress condition}
-specifies the effect of the rule on the state of the count (e.g.
-all ballots are counted). 
+We sometimes refer, somewhat informally, to the conditions the various rules must
+satisfy as \emph{sanity checks}. They are the
+formal counterparts of the legislation that informs counting officers
+which action to perform, when. 
+Each sanity check consists of two parts: 
+the \emph{applicability condition}
+specifies under what conditions the rule can be applied while
+the \emph{progress condition} specifies the effect of the
+rule on the state of the count.
+For example, the count rule is applicable 
+if there are uncounted ballots and reduces
+the number of uncounted ballots.
+
 We establish
-three  main properties about this generic version of STV. The first
-one asserts that each application of any of the generic transition
-of STV which satisfies constraints of sanity checks, reduces a
-complexity measure. The second property ensures us that at any
-non-final state of the counting, at least one of the generic
-transitions is applicable provided that they all satisfy the sanity
-check requirements. Finally, we prove a termination theorem for
-this minimal STV algorithm. 
+three  main properties of this generic version of STV. The first
+is that each application of any of the generic transitions
+of STV 
+%which satisfies its sanity check, 
+reduces a complexity measure. The second is that at any
+non-final state of the count, at least one of the generic
+transitions is applicable because it satisfies its sanity
+check requirements. The third is that the overall 
+minimal STV algorithm terminates. 
 
 All this is carried out inside the Coq theorem prover
 \cite{Bertot:2004:ITP}.  Using Coq's extraction mechanism
 \cite{Letouzey:2003:NEC} we can then automatically synthesise a
 (provably correct) program for STV counting from the termination
 proof.  
-By construction, the executables are certifying programmes which
+By construction, the executables are certifying programs which
 produce an visualised trace of computation upon each execution. The
-certificate is checkable \emph{by general member of the public} for
+certificate is checkable \emph{by a general member of the public}
+for\marginpar{Surely this is too strong. The member has to have some intelligence.}
 correctness independent of the means employed for producing it.
-That is to say, we provably implement the count-as-cast
+That is to say, we provably implement the counted-as-cast
 aspect ~\cite{DBLP:journals/iacr/CortierGKMT16} of universal
 verifiability. Finally, our experimental tests with real
 elections demonstrate feasibility of our approach for  real world
 applications. Compared with other formalisations of STV, where
 even small changes in the details of a single rule requires adapting
-a global correctness proof, the outstanding feature of the work
-reported here is \emph{modularity}, that is, sanity checks are local to each
-rule) and \emph{abstraction}, i.e. a general correctness proof based
+a global correctness proof, the outstanding features of our work
+is \emph{modularity}, since sanity checks are local to each
+rule, and \emph{abstraction}, since the general correctness proof is based
 on the local conditions for each rule. It is precisely this
 simplicity that allows us to capture a large number of variations of STV,
 including several used in Australian parliamentary elections.
@@ -229,19 +249,26 @@ as snapshots of the hand counting procedure, where there is e.g. a
 current tally, and a set of uncounted ballots at every stage.
 Tallying is then formalised as transition between these states. 
 
-There are three types of machine sates: \emph{initial},
-\emph{intermediate}, and \emph{final}. An initial state specifies
+There are three types of machine states: \emph{initial},
+\emph{intermediate}, and \emph{final}. An initial state contains
 the list of all \emph{formal} ballots. 
-Final states of the machine are accepting stages where
-winners of an election are announced. Each intermediate state
-consists of six components: \begin{enumerate}
-\item A set of uncounted ballots, which must be counted
-\item A tally function computing the amount of vote for each candidate
-\item A pile function computing which ballots are assigned to which candidate
-\item A list of already elected candidate whose votes awaits being transferred
-\item A list of the eliminated candidates whose votes should be deal with
-\item A list of elected candidates
-\item A list of continuing candidates 
+Final states 
+%of the machine 
+are 
+%accepting stages 
+where
+winners 
+%of an election 
+are declared. Each intermediate state
+consists of seven components: 
+\begin{enumerate}
+\item A set of uncounted ballots, which must be counted;
+\item A tally function computing the number of votes for each candidate;
+\item A pile function computing which ballots are assigned to which candidate;
+\item A list of already elected candidates whose votes await transfer;
+\item A list of the eliminated candidates whose votes need to be dealt with;
+\item A list of elected candidates; and
+\item A list of continuing candidates.
 \end{enumerate}  
 %One could think of  the pile and tally functions as abstraction of
 %the action performed by tally officers when they respectively assign
@@ -249,25 +276,27 @@ consists of six components: \begin{enumerate}
 
 
 \noindent
-Our mathematical formalisation uses the following terminology. 
-We write $\mathcal{C}$ for the set of candidates 
-participating in an election. Individual candidates are denoted by 
-$c$, $c'$, and $c''$. The set of ballots
-$\mathcal{B}$, is a shorthand for (\textsf{List}
-$\mathcal{C}$)$\times\mathbb{Q}$, where $\mathbb{Q}$ is the set of
-rational numbers. Therefore a ballot $\mathit{ba}$ is a pair $(l,q)$ where
-$l\in$ \textsf{List}($\mathcal{C}$) and $q\in\mathbb{Q}$. The
-characters $h$ and $nh$ are reserved for lists of continuing
-candidates (``hopefuls''), $e$ and $ne$ for lists of elected candidates, and $bl$,
-$nbl$ for backlogs. A backlog $bl$ is a pair $(l1,l2)$, where $l1$
-contains the list of elected candidate whose votes should be
-transferred, and $l$ is list containing the eliminated candidates
-whose votes are to be transferred.The quota of election and number of seats are symbolised by $qu$ and
-$st$, respectively. Finally, tallies are denoted by $t$, $nt$ and
-piles by $p$, $np$.  
- The prefix ``$n$'' in the above
-stands for ``new'', e.g. $\mathit{ne}$ denotes the elected
-candidates in the post state, after an action has been applied.
+Our mathematical formalisation uses the following terminology.  We
+write $\mathcal{C}$ for the set of candidates participating in an
+election. Individual candidates are denoted by $c$, $c'$, and
+$c''$. The set $\mathcal{B}$ of ballots is shorthand for
+(\textsf{List} $\mathcal{C}$)$\times\mathbb{Q}$, where $\mathbb{Q}$ is
+the set of rational numbers. Thus a ballot $\mathit{ba}$ is a pair
+$(l,q)$ where $l\in$ \textsf{List}($\mathcal{C}$) and
+$q\in\mathbb{Q}$. The characters $h$ and $nh$ are reserved for lists
+of continuing candidates (``\underline{h}opefuls''), $e$ and $ne$ for lists of
+\underline{e}lected candidates, and $bl$, $nbl$ for
+\underline{b}ack\underline{l}ogs. 
+A backlog $bl$ is a
+pair $(l1,l2)$, where $l1$ is a list of elected candidates
+whose votes await transfer, and $l2$ is a list of the
+eliminated candidates whose votes await transfer. The \underline{qu}ota for being
+elected and the number of vacant seats are denoted by $qu$ and $st$,
+respectively. Finally, \underline{t}allies are denoted by $t$, $nt$ and \underline{p}iles by
+$p$, $np$.  
+The prefix ``$n$'' always stands for ``new'', 
+thus $\mathit{ne}$ denotes the elected candidates in the post state,
+after an action has been applied.
 
 
 Suppose $ba \in\mathcal{B}$, and $bl , h, e, w \in$
