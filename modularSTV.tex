@@ -15,8 +15,7 @@
 \graphicspath{ {images/} }
 
 \newcommand{\textred}[1]{\textrm{\textcolor{red}{#1}}}
-
-
+\newcommand{\textgreen}[1]{\textrm{\textcolor{green}{#1}}}
 
 \newenvironment{myindent}{\begin{adjustwidth}{2ex}{}}{\end{adjustwidth}}
 %\usepackage{caption}
@@ -929,7 +928,7 @@ Figure~\ref{fig;fig.3}.
 The counting protocol of Victoria STV, defines surpuls votes to be \lq\lq \emph{the number, if any, of votes in excess of the
 quota of each elected candidate}\rq\rq. Moreover it dictates, under Section 17, Subsection 7 Clause (a), that \lq\lq  \emph{the number of surplus votes of the elected candidate is to be
 divided by the number of first preference votes received by the
-elected candidate and the resulting fraction is the transfer value}\rq\rq. In lines 6 and 7, we compute the surplus vote and the fractional transfer value accordingly and multiply it at the current value of every ballot in the pile of the elected candidate $c$ to update the pile of this candidate. 
+elected candidate and the resulting fraction is the transfer value}\rq\rq. In lines 6 and 7, we compute the surplus vote and the fractional transfer value accordingly and multiply it by the current value of every ballot in the pile of the elected candidate $c$ to update the pile of this candidate. 
 
 
 The protocol further states under subsection (8), and (13) that \lq\lq \emph{Any continuing candidate who has received a number of votes equal to
@@ -938,12 +937,13 @@ excluded candidate under subsection (12) or (16), is to be declared elected}\rq\
 The definition requires electing candidate(s) no matter how they
 have obtained enough votes. We therefore implement clauses (8) and
 (13) in Line 5, where we elect everyone over or equal to the quota,
-place them in the update list of elected candidates
-{\fontfamily{qcr}\selectfont ne}, and insist that the list of
-elected candidates in this state, namely
-{\fontfamily{qcr}\selectfont l} and the old list of elected
-candidates {\fontfamily{qcr}\selectfont e} together form a
-permutation of {\fontfamily{qcr}\selectfont ne}. The choice for
+place them in the update list {\fontfamily{qcr}\selectfont ne} of
+elected candidates, 
+and insist that the list {\fontfamily{qcr}\selectfont l}  of elected
+candidates in this state and 
+the old list {\fontfamily{qcr}\selectfont e} of elected candidates together form a
+permutation of {\fontfamily{qcr}\selectfont ne}. The choice
+for\marginpar{I could not understand ``choice for permutation''?}
 permutation carries further details which realise other parts of the
 protocol, which we leave to the reader. 
 
@@ -956,7 +956,7 @@ according to the tally amount. When it comes to transferring elected
 surplus, as we see in Line 4 of Figure~\ref{fig;fig.4}, the biggest
 surplus is dealt with first which belongs to candidate $c$.
 Furthermore, Line 5 specifies that  \emph{all of this candidate's
-surplus is distributed} at the fractional value decided in
+surplus is distributed} at the fractional value computed in
 {\fontfamily{qcr}\selectfont Victoria\_Elect}.
 \begin{scriptsize}
 %\begin{figure}[h]
@@ -977,13 +977,14 @@ surplus is distributed} at the fractional value decided in
 %Lines 1 and 3 along with first conjuncts of lines~2 and 4 correspond to the first item of definition~\ref{trans:check} of transfer sanity check. On the other hand, line 5 and conjuncts of line 4 enable {\fontfamily{qcr}\selectfont Victoria\_TransferElected} to successfully pass expectations of the second item in definition~\ref{trans:check}. Hence, the Victoria's instantiation of transfer-elected fulfils the reducibility and local applicability checks of definition~\ref{stv:alg}  and therefore respects the generic STV algorithm.  
 %\vspace*{-0.5cm}
 \subsection{Australian Capital Territory STV}
-Government of the Australian Capital Territory uses a version of
-STV~\cite{Assembly:1994:AEP} for election of the lower house. This STV stands out for
-some of its characteristics, including transfer of the last parcel
+Lower house elections in the Australian Capital Territory (ACT) use a version of
+STV~\cite{Assembly:1994:AEP} which stands out for
+some of its characteristics, including transfer of the ``last parcel''
 of votes and the formulation of transfer value.  The 
 specification of the elect transition of ACT STV is similar to the
 one in Figure~\ref{fig;fig.4} except for lines 6 and 7, which are
-replaced by the following.\\ \begin{small}
+replaced by the following:\\
+\begin{small}
 {\fontfamily{qcr}\selectfont np(c)= \textsf{map}}
 ({\fontfamily{qcr}\selectfont \textsf{fun} b =>}
 \begin{tabular}{c}
@@ -993,24 +994,36 @@ replaced by the following.\\ \begin{small}
 \end{tabular}) {\fontfamily{qcr}\selectfont (\textsf{last}(p c))}
 \end{small}
 
+% replaced by the following.\\ 
+% \begin{small}
+% {\fontfamily{qcr}\selectfont np(c)= \textsf{map}}
+% ({\fontfamily{qcr}\selectfont \textsf{fun} b =>}
+% \begin{tabular}{c}
+% {\fontfamily{qcr}\selectfont (\textsf{fst} b,(\textsf{snd} b)$\times$((\textsf{hd} nty t(c))- quota)}\\
+% \hline 
+% {\fontfamily{qcr}\selectfont (\textsf{Sum} \textsf{snd}(\textsf{last}(p c))}
+% \end{tabular}) {\fontfamily{qcr}\selectfont (\textsf{last}(p c))}
+% \end{small}
+
 \noindent
 Moreover, the ACT version of transfer-elected is as in 
 Figure~\ref{fig;fig.4} except that the fist conjunct in Line 5 is
-substituted by a different proposition and reads \texttt{nba = last
+replaced by a different proposition and reads \texttt{nba = last
 (p c)}. 
-The two variations together tell us that we only transfer the last parcel of the elected candidate and the transfer value equals to the surplus votes of this candidate divided by the sum of fractional values of this last parcel, rather than the tally of the elected candidate.  
+The two variations together tell us that we only transfer the last parcel of the elected candidate and the transfer value equals the surplus votes of this candidate divided by the sum of fractional values of this last parcel, rather than the tally of the elected candidate.  
 
-There are obvious possible issues with the transfer value formula
-used in the ACT STV. It may come to a situation where the fractional
-value of a surplus vote is bigger than 1, which is essentially a
-flaw of the algorithm. As a result, the software used by authorities
-of ACT which implements the algorithm~\cite{Improvements:2015:EVC}, makes modifications to ensure no surplus votes become more than 1. We adapt this corrected version in our implementation. Nonetheless, nothing would restrict  us from  selecting the defective original formula of ACT STV, if we chose to.
+There are obvious issues with the transfer value
+formula used in the ACT STV~\cite{DBLP:conf/voteid/GoreL16}. 
+For example, it is possible for the calculated fractional
+value of a surplus vote to exceed 1, which is clearly a
+flaw of the algorithm. As a result, the software used by 
+the ACT election commission which implements the
+algorithm~\cite{Improvements:2015:EVC}, makes explicit modifications to ensure no surplus votes exceeds 1. We adapt this corrected version in our formalisation. Nonetheless, nothing would restrict  us from  selecting the defective original formula of ACT STV, if we chose to.
 %\subsection{CADE STV}
-\section{Certifying Extracted Programmes and Experiments}
-We use the built-in mechanisms of Coq to  extract executable programme for each module into the Haskell language. The automatic extraction  method provides a sufficient degree of  verification that the executable behaves in accordance to its Coq formalisation. Correctness proofs established in the Coq therefore extend to the executables. However, upon each execution of the programs, we generate a run-time certificate which functions as an independently checkable evidence for reliability of the computation carried out.
+\section{Certifying Extracted Programs and Experiments}
 
 \begin{small}
-\begin{figure}[h]
+\begin{figure}[b]
 \begin{tabular}{c@{\hspace{2cm}}c}
 %\\[0.5em]
     \AxiomC{\scriptsize\textsf{initial} [([a,c,b],1/1),([b,c,a],1/1),([c,a],1/1),([c,b,a],1/1)] }
@@ -1033,31 +1046,53 @@ We use the built-in mechanisms of Coq to  extract executable programme for each 
     \UnaryInfC{\scriptsize\textsf{winners} [c] }
     \DisplayProof
 \end{tabular}
-\caption{example of a certificate}
+\caption{Example of a certificate}
 \label{fig;figure5}
 \end{figure}
 \end{small}
+
+We use the built-in mechanisms of Coq to  extract executable Haskell
+programs for each module. The automatic extraction  method provides a
+sufficient degree of  verification that the executable behaves in
+accordance to its Coq formalisation.\marginpar{This is patently
+  false!} Correctness proofs established in the Coq therefore extend
+to the executables. 
+However, each execution of the extracted program generates a
+run-time certificate, providing independently checkable evidence
+of the underlying computation.
+
+
 \noindent
-Theorem~\ref{termination} guarantees that for each run of the program a formal certificate exists. Moreover, the theorem elaborates that the formal certificate is the sequence of computation performed in the execution to obtain the final result. To produce a concrete certificate, upon each execution of extracted Haskell programmes, we visualise this formal sequence of machine states and transitions which we have encountered  from the input to reach to the end result.
+Theorem~\ref{termination} guarantees that for each run of the
+program\marginpar{Lots of repetition here.}
+a \textred{?formal?} certificate exists. Moreover, the theorem
+guarantees that the \textred{formal} certificate is the sequence of
+computation  performed in the execution to obtain the final result. To
+produce a concrete certificate, upon each execution of extracted
+Haskell programmes, \marginpar{Delete red words?} we visualise this \textred{formal} sequence of machine states and transitions \textred{which we have encountered}  from the input to reach to the end result.
 
-
-The certificate generated for each input proves correctness of the
-count to the general public, without need to trust in the skilfulness of the programmer, their  well grounded understanding of legal texts, the extraction means used, and any hardware malfunctioning. 
+The certificate generated for each input proves \textgreen{?how?} \marginpar{Where is
+  the theorem that says correct certificate implies correct result?} the correctness of the
+count to the general public, without having to trust the programmer, 
+their own understanding of legal texts, the extraction means used, nor
+any underlying hardware. 
 %It can be \emph{scrutinised by anyone} for its conformity with the STV counting algorithm employed to tally election votes. 
-Checkability of the visualised certificate by \emph{any scrutineers} witnesses that our tallying technique satisfies the count-as-recorded subproperty of the universal verifiability quality. Consequently, any election protocol designed for STV schemes which requires proof of tallying correctness can utilize our tool.
+Checkability of the \textred{?visualised?} certificate by \emph{any
+  scrutineers} witnesses that our tallying technique satisfies the
+count-as-recorded subproperty of universal verifiability. Thus any
+election protocol designed for STV schemes which requires a proof of tallying correctness can utilize our tool.
 
  Figure~\ref{fig;figure5} illustrates an example of a concrete
  certificate, where candidates a, b, and c are competing for one
- seat. We discuss certification only briefly as it is analogous to
- \cite{Ghale:2017:FVS}.
+ seat. We discuss certification only briefly as it is described elsewhere~\cite{Ghale:2017:FVS}.
  We use exact fractions for
- computations to avoids issues explained in
- literature~\cite{DBLP:conf/voteid/GoreL16} about rounding numbers.
- Every line shows six component each of which
- corresponds to an abstract data representation of the intermediate
+ computations to avoid the rounding issues explained
+ elsewhere~\cite{DBLP:conf/voteid/GoreL16}.
+ Every line shows six components, each 
+ corresponding to an abstract data representation of the intermediate
  states of the abstract  machine: the 
- list of uncounted ballots, the tallies of candidates, each
- candidate's pile, the backlog and the list of elected and
+ list of uncounted ballots; the tallies of candidates; each
+ candidate's pile; the backlog; and the lists of elected and
  continuing candidates. 
  %The list of initial ballots is placed at the top. The step start
  %decides on formal ballots and the quota of this sample election.
@@ -1074,11 +1109,11 @@ Checkability of the visualised certificate by \emph{any scrutineers} witnesses t
  
  We have evaluated the efficiency of our approach by testing the
  extracted module for the lower house ACT STV on some real elections
- held in 2006 and 2008 (Figure~\ref{ref;figure6}). The Molonglo
+ held in 2006\marginpar{Why does
+   the figure say 2008 and 2012?}  and 2008 (Figure~\ref{ref;figure6}). The Molonglo
  electorate of ACT is the biggest lower house electorate in
- Australia, both in terms of the number of candidates who are
- elected and the number of voters in the district. The extracted
- programme computes the result in just 22 minutes.  \begin{small}
+ Australia, both in the number of vacancies and the number of voters. The extracted
+ program computes the result in just 22 minutes.  \begin{small}
 \begin{figure}[b]
 \centering
 %\begin{tabu} to 0.86\textwidth {X[c] X[c] X[c] X[c] X[c] X[c]}
@@ -1099,10 +1134,11 @@ Molonglo&$91534$&$7$&$27$&$664$&208.4&2012\\
 \end{figure}
 \end{small}  
 \section{A Technical Discussion}
-We have introduced a framework for formalisation, verification, and
+We have introduced a framework for formalisation, verification,
+and\marginpar{This requires significant improvements as it rambles.}
 provably correct computation with various STV algorithms. Our
 software is the outcome of macro level design decisions which we
-made prior to the implementation. In the architecture, we have been
+made prior to the \textred{implementation???}. In the architecture, we have been
 attentive to  balancing out between different standards for
 designing a framework. The modular design allows for a much simpler
 implementation than made possibly by other frameworks (e.g.
@@ -1142,40 +1178,56 @@ verified executable implementation of their favourite STV. On the
 other hand, accomplishing the same goal by using the previous
 platform, demands  25000 lines of encoding, along with overcoming
 numerous technicalities.   
+
 \paragraph{\textbf{Related work.}}
-DeYoung and Schurmann~\cite{DBLP:conf/voteid/2011} use Linear
-Logic~\cite{DBLP:journals/apal/Girard93} to formally specify a STV
-scheme and then discharge proofs inside the logical framework of
-Celf~\cite{DBLP:conf/cade/Schack-NielsenS08}. Technical knowledge of
-linear logic is required to understand how the textual description
-of the protocol matches with the formal one. On the other hand,
-Pattinson and Shurmann~\cite{DBLP:conf/ausai/PattinsonS15}, and
+DeYoung and Sch\"urmann~\cite{DeYoung:2012:LLV}
+formally specify an STV
+scheme as a linear logic~\cite{DBLP:journals/apal/Girard93} program
+and then discharge the required correctness 
+proofs inside the logical framework
+Celf~\cite{DBLP:conf/cade/Schack-NielsenS08}. Celf is capable of
+executing the specification but their linear logic program does not scale to real-world
+elections.
+
+Dawson et.\ al.\ encode an ML program for STV counting into the HOL4
+theorem prover~\cite{DBLP:conf/voteid/DawsonGM15} and prove various
+correctness properties of the program, including termination. HOL4 is
+able to execute the ML encoding within reasonable time bounds for
+small elections, but not for large ones. But there is a gap between
+the HOL4 semantics of ML and those used by ML compilers. This gap
+could be closed by re-encoding the ML program into the CakeML verified
+compiler~\cite{cakeml} to produce a fully verified ML program, but has
+not been done to date.
+
+Pattinson and Sh\"urmann~\cite{DBLP:conf/ausai/PattinsonS15}, and
 Verity and Pattinson~\cite{DBLP:conf/acsw/VerityP17} formalise a
-simple version of STV and First-past-The-Post elections in Coq.
-Their approach reduces the gap between the informal protocol and the
-encoded counting rules. Also they prove some properties such
-existence of winners in every formal execution. Then they extract
-certifying executable in Haskell which can compute large size
-elections. Pattinson and Tiwari~\cite{DBLP:conf/itp/PattinsonT17}
-tackle verification of Schultz method by the similar approach of
-specifying the algorithm in Coq, discharging proofs and extracting
-executables in Haskell and OCaml. Their extracted executable outputs
-performs effectively and certificates output in each run of the
-programme offer a unique feature. Besides evidence supporting why
-the winner has been elected, it also visualises non-existence of any
-path between each defeated candidate and the winner. Dawson et
-al~\cite{DBLP:conf/voteid/DawsonGM15} formalise a version of
-Hare-Clark in the theorem prover HOL~\cite{hol4}. Their
-specification is expressed in the Higher-Order-Logic. Moreover, they
-encode computational definition inside HOL and prove its correctness
-against the HOL specification of the protocol.  Then to actually
-compute, they manually transliterate the computational definitions
-from HOL into the syntax of Standard ML functional language.  A
-significant issue with this approach is existence of no guarantee
-that  the transliterate encoding would behave according to the
-original HOL definitions, simply because of semantic differences of
-HOL and SML. Therefore, their verification does not legitimately
-extend beyond HOL to the SML programme. 
+simple version of STV and first-past-the-post elections in Coq and
+prove properties such as termination and the existence of winners.
+Then they extract certifying executables in Haskell which can handle
+real-world elections. Their crucial contribution is that their
+executable code produces a certificate for every run, which can be
+idependently verified. \textred{Do they prove that a correct
+  certificate implies a correct result?}
+
+Pattinson and Tiwari~\cite{DBLP:conf/itp/PattinsonT17} extend this
+method to tackle the Schultz method~\cite{schulze-method}.  Their extracted code handles
+real-world election and also outputs a certificate for every run.
+The certificate not only witnesses how the winner was elected, but also
+provides concrete evidence that each losing candidate is a ``loser''.
+
+Dawson et al~\cite{DBLP:conf/voteid/DawsonGM15} formalise a version of
+Hare-Clark in the theorem prover HOL~\cite{hol4}. Their specification
+is expressed in the Higher-Order-Logic. Moreover, they encode
+computational definition inside HOL and prove its correctness against
+the HOL specification of the protocol.  Then to actually compute, they
+manually transliterate the computational definitions from HOL into the
+syntax of Standard ML functional language.  A significant issue
+with\marginpar{This prose is not acceptable to me. I have reworded it above.}
+this approach is existence of no guarantee that the transliterate
+encoding would behave according to the original HOL definitions,
+simply because of semantic differences of HOL and SML. Therefore,
+their verification does not legitimately extend beyond HOL to the SML
+programme.
 
 \section{Conclusion}
 We have designed a modular framework for formalisation, verification, 
