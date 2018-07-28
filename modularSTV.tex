@@ -1144,7 +1144,7 @@ election protocol designed for STV schemes which requires a proof of tallying co
  electorate of ACT is the biggest lower house electorate in
  Australia, both in the number of vacancies and the number of voters. The extracted
  program computes the result in just 22 minutes.  \begin{small}
-\begin{figure}[b]
+\begin{figure}[h]
 \centering
 %\begin{tabu} to 0.86\textwidth {X[c] X[c] X[c] X[c] X[c] X[c]}
 \begin{tabular}{|l |c |c |c |c |c|c|}
@@ -1164,50 +1164,77 @@ Molonglo&$91534$&$7$&$27$&$664$&208.4&2012\\
 \end{figure}
 \end{small}  
 \section{A Technical Discussion}
-We have introduced a framework for formalisation, verification,
-and
-provably correct computation with various STV algorithms. In the
-design decisions that we made, 
-we have been 
-balancing different aspects for
-designing a framework. The modular design allows for a much simpler
-implementation than made possibly by other frameworks (e.g.
+We have introduced a framework for formalisation, verification, and provably correct computation with various STV algorithms. In the design decisions that we made, 
+we have been  balancing different aspects for
+designing a framework. The modular design allows for a much simpler implementation than made possibly by other frameworks (e.g.
 \cite{Ghale:2017:FVS}) as we only need to discharge proofs at a
-per-rule basis which is also reflected in the fact that (a) we
-capture realistic voting protocols, and (b) we can accommodate a
-larger number of protocols with ease.
-  
+per-rule basis which is also reflected in the fact that (a) we capture realistic voting protocols, and (b) we can accommodate a larger number of protocols with ease. 
+%\begin{small}
+\begin{figure}[b]
+%\centering
+\begin{scriptsize}
+\smallskip\noindent\framebox{\parbox{\textwidth}{
+\tikzset{
+  treenode/.style = {shape=rectangle, rounded corners,
+                     draw, align=center,
+                     top color=white, bottom color=blue},
+  root/.style     = {treenode, font=\Large, bottom color=white},
+  env/.style      = {treenode, font=\ttfamily\normalsize},
+  env/.style    = {circle,draw}
+}
 
-Previous work emphasises data structures and certification, and
-showcases this by means of monolithic specifications and proofs. Our
-work adds modularity,  and we distil the algorithmic essence of STV
-into what we call \emph{sanity checks}.
+\begin{tikzpicture}
+  [
+    grow                    = right,
+    sibling distance        = 4.5em,
+    level distance          = 12.5em,
+    edge from parent/.style = {draw, -latex},
+    every node/.style       = {font=\footnotesize},
+    sloped
+  ]
+  \node [root] {\small Parameters}
+   % child { node [env] {equation}
+    %  edge from parent node [below] {single-line?} }
+    child { node [root] {\small Base}
+      child { node [env] {\small Instantiation}
+        child { node [env] {$STV_k$}
+          edge from parent node [below] {\small $k^{th}$ module} }
+        child { node [env] {$STV_2$}
+          edge from parent node [above] {\small $2^{nd}$ module}
+                           node [below] {} }
+        child { node [env] {$STV_1$}
+                edge from parent node [above] {\small $1^{st}$ module} }
+        edge from parent node [below] {} }
+      %child { node [env] {multline}
+      % edge from parent node [above, align=center]
+       %         {first left,\\centered,}
+        %      node [below] {last right}}
+         %     edge from parent node [above] {multi-line?} 
+         };
+\end{tikzpicture}
+}}
+\end{scriptsize}
+\caption{System Description}
+\label{ref;figure7}
+\end{figure}
+%\end{small}   
 
-Every instance of STV satisfying the sanity checks enjoys the
-rule applicability and termination properties established in
-Theorems~\ref{app} and~\ref{termination}. Therefore, for an instance
-of STV to be verified, we simply need to 
-establish that the sanity checks hold, 
+Previous work emphasises data structures and certification, and showcases this by means of monolithic specifications and proofs. Our work adds modularity,  and we distil the algorithmic essence of STV into what we call \emph{sanity checks}.
+
+Every instance of STV satisfying the sanity checks enjoys the rule applicability and termination properties established in Theorems~\ref{app} and~\ref{termination}. Therefore, for an instance of STV to be verified, we simply need to  establish that the sanity checks hold, 
 rather than duplicate the whole proof process. These checks
 offer an abstraction on the algorithmic side which helps us
-avoid
-duplication of code. Unlike previous work, users do
-not need to know how the application  and termination theorems have been
-proved in order to show termination of their particular instance. Additionally, separation into modules
-further improves usability. Anyone seeking a verified implementation of
-their preferred flavour of STV can simply use our framework and
-instantiate as appropriate.
+avoid duplication of code. Unlike previous work, users do
+not need to know how the application  and termination theorems have been proved in order to show termination of their particular instance. Additionally, separation into modules further improves usability. Anyone seeking a verified implementation of their preferred flavour of STV can simply use our framework and instantiate as appropriate. 
+
+Figure~\ref{ref;figure7} illustrates the framework architecture. The parameters component includes type level declaration of candidates, vacancies, and the quota. The base comprises the encoding of the generic STV model along with functions commonly called by the dependent modules. The  instantiation component consists of instantiating types specified in the parameters file and automatically discharging of required proofs. Finally, the instantiated generic model is called into each module for discharging sanity checks and consequently extracting provably correct Hakell programs.
+   
 
 The ability to just instantiate is significant as many
 aspects are dealt with once and for all
 in the base layer of roughly 25000 lines of
 code. Each module already formalised is less than 500 lines.
-Therefore, an interested user has to just carry out formalisation
-and discharging sanity checks in about 500 lines to acquire a
-verified executable implementation of their favourite STV. On the
-other hand, accomplishing the same goal by using the previous
-platform, demands  25000 lines of encoding, along with overcoming
-numerous technicalities.   
+Therefore, an interested user has to just carry out formalisation and discharging sanity checks in about 500 lines to acquire a verified executable implementation of their favourite STV. On the other hand, accomplishing the same goal by using the previous platform, demands  25000 lines of encoding, along with overcoming numerous technicalities.   
 
 \paragraph{\textbf{Related work.}}
 DeYoung and Sch\"urmann~\cite{DeYoung:2012:LLV}
@@ -1225,9 +1252,7 @@ correctness properties of the program, including termination. HOL4 is
 able to execute the ML encoding within reasonable time bounds for
 small elections, but not for large ones. But there is a gap between
 the HOL4 semantics of ML and those used by ML compilers. This gap
-could be closed by re-encoding HOL terms into CakeML and then using
-CakeML's deep embedding to produce a verified executable
-\cite{POPL14}, but this
+could be closed by using the proof-producing synthesis~\cite{Myreen} of CakeML code from the HOL assertions, then using the verified CakeML compiler~\cite{POPL14} to porduce the machine code. However, this
 has not been done to date. 
 
 Pattinson and Sch\"urmann~\cite{DBLP:conf/ausai/PattinsonS15}, and
@@ -1245,21 +1270,8 @@ real-world election and also outputs a certificate for every run.
 The certificate not only witnesses how the winner was elected, but also
 provides concrete evidence that each losing candidate is a ``loser''.
 
-\iffalse
-Dawson et al~\cite{DBLP:conf/voteid/DawsonGM15} formalise a version of
-Hare-Clark in the theorem prover HOL~\cite{hol4}. Their specification
-is expressed in the Higher-Order-Logic. Moreover, they encode
-computational definition inside HOL and prove its correctness against
-the HOL specification of the protocol.  Then to actually compute, they
-manually transliterate the computational definitions from HOL into the
-syntax of Standard ML functional language.  A significant issue
-with\marginpar{This prose is not acceptable to me. I have reworded it above.}
-this approach is existence of no guarantee that the transliterate
-encoding would behave according to the original HOL definitions,
-simply because of semantic differences of HOL and SML. Therefore,
-their verification does not legitimately extend beyond HOL to the SML
-programme.
-\fi
+%\iffalse
+%Dawson et al~\cite{DBLP:conf/voteid/DawsonGM15} formalise a version of Hare-Clark in the theorem prover HOL~\cite{hol4}. Their specification is expressed in the Higher-Order-Logic. Moreover, they encode computational definition inside HOL and prove its correctness against the HOL specification of the protocol.  Then to actually compute, they manually transliterate the computational definitions from HOL into the syntax of Standard ML functional language.  A significant issue with\marginpar{This prose is not acceptable to me. I have reworded it above.} this approach is existence of no guarantee that the transliterate encoding would behave according to the original HOL definitions, simply because of semantic differences of HOL and SML. Therefore, their verification does not legitimately extend beyond HOL to the SML programme.\fi
 \section{Conclusion}
 We have designed a modular framework for formalisation, verification, 
 and provably correct computation of STV algorithms. Our work
@@ -1322,15 +1334,17 @@ Gor{\'{e}}, R., Lebedeva, E.: Simulating {STV} hand-counting by computers
   considered harmful: {A.C.T}. In: Proc. EVote-ID 2016. pp. 144--163 (2016)
 
 \bibitem{Trust:2018:AT}
-{John Muir Trust}: Apply to be a trustee (2018),
-  \url{https://www.johnmuirtrust.org/assets/000/002/860/\\How\_to\_apply\_to\_be\_a\_Trustee\_Jan\_2018\_original.pdf},
-  accessed May 15, 2018
+{John Muir Trust}: Apply to be a trustee,
+  \url{https://www.johnmuirtrust.org/assets\\/000/002/860/How\_to\_apply\_to\_be\_a\_Trustee\_Jan\_2018\_original.pdf},
+accessed May 15, 2018
 
 \bibitem{POPL14}
 Kumar, R., Myreen, M.O., Norrish, M., Owens, S.: {CakeML}: A verified
   implementation of {ML}. In: Principles of Programming Languages ({POPL}). ACM
   (Jan 2014)
-
+\bibitem{Myreen}
+Magnus, M.O, Scott, O.:
+Proof-producing translation of higher-order logic into pure and stateful ML. J. Funct. Program. 24(2-3): 284-315 (2014)
 \bibitem{Letouzey:2003:NEC}
 Letouzey, P.: A new extraction for {Coq}. In: Geuvers, H., Wiedijk, F. (eds.)
   Proc. TYPES 2002. Lecture Notes in Computer Science, vol. 2646, pp. 200--219.
@@ -1351,8 +1365,7 @@ Schack{-}Nielsen, A., Sch{\"{u}}rmann, C.: Celf - {A} logical framework for
   pp. 320--326 (2008)
 
 \bibitem{Improvements:2015:EVC}
-{Software Improvements}: Electronic and voting and counting sytems.
-  http://www.softimp.com.au/evacs/index.html (2015), accessed at May 12, 2015
+{Software Improvements}: Electronic and voting and counting sytems. http://www.softimp.com.au/evacs/index.html, accessed at May 12, 2015
 
 \bibitem{StackExchange:2018:ME}
 StackExchange: Moderator elections (2018),
@@ -1360,8 +1373,7 @@ StackExchange: Moderator elections (2018),
   15, 2018
 
 \bibitem{PV:2002:EA}
-{The Parliament of Victoria}: Electoral act 2002 (2002), see also
-  https://www.elections.act.gov.au/education/act\_electoral\_commission\_fact\_sheets/fact\_sheets\_-\_general\_html/elections\_act\_factsheet\_hare-clark\_electoral\_system
+{The Parliament of Victoria}: Electoral act 2002 , see also https://www.elections.act\\.gov.au/education/act\_electoral\_commission\_fact\_sheets/fact\_sheets\_-\_general\_html/elections\_act\_factsheet\_hare-clark\_electoral\_system
 
 \bibitem{DBLP:conf/acsw/VerityP17}
 Verity, F., Pattinson, D.: Formally verified invariants of vote counting
