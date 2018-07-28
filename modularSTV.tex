@@ -21,7 +21,8 @@
 %\usepackage{caption}
 %\usepackage{eeesubcaption}
 \title{Modular Formalisation and Verification of \\STV Algorithms}
-\author{} % double blind
+\author{}
+\institute{The Australian National University}
 \begin{document}
 \maketitle
 \pagestyle{plain}
@@ -98,8 +99,8 @@ flavours of STV into a set of minimal requirements that we
 \emph{minimal} STV. It consists of:
 \begin{itemize}
 \item the data (structure) that captures all states of the count
-\item the requirements that these common elements, and three
-  other, must obey.
+\item the requirements that building blocks (transfer, count,
+\dots) must obey.
 % \item the requirements that count, elect, eliminate, transfer, and
 % three others, 
 % %have to 
@@ -175,9 +176,8 @@ All this is carried out inside the Coq theorem prover
 proof.  
 By construction, the executables are certifying programs which
 produce an visualised trace of computation upon each execution. The
-certificate is checkable \emph{by a general member of the public}
-for\marginpar{Surely this is too strong. The member has to have some intelligence.}
-correctness independent of the means employed for producing it.
+correctness of the certificate can be checked by anyone with minimal
+technical knowledge, independent of the way it was obtained. 
 That is to say, we provably implement the counted-as-cast
 aspect ~\cite{DBLP:journals/iacr/CortierGKMT16} of universal
 verifiability. Finally, our experimental tests with real
@@ -278,7 +278,7 @@ consists of seven components:
 
 
 \noindent
-We use\marginpar{Dirk, please check!}
+We use
 $\mathcal{C}$ 
 for the set of all candidates participating in an
 election and use $c$, $c'$, and $c''$ for individual candidates from 
@@ -292,15 +292,12 @@ for the set of rational numbers.
 A ballot is an ordered pair
 $(l,q)$ where 
 $l\in$ \textsf{List}($\mathcal{C}$) is the preference order and
-$q\in\mathbb{Q}$ is a possibly fractional value of this ballot.
-Then,
-$\mathcal{B}$ 
-is shorthand for 
-\textsf{List}($\mathcal{C}$)$\times\mathbb{Q}$,
-the set of all possible ordered pairs from 
-\textsf{List}($\mathcal{C}$)
-and $\mathbb{Q}$.
- We use $h$ and $nh$ for lists
+$q\in\mathbb{Q}$ is the (possibly fractional) value of this ballot.
+We write $\mathcal{B} = 
+\mathsf{List}(\mathcal{C})\times\mathbb{Q}$ for the set of all
+ballots, i.e. preference ordered lists of candidates, together with
+a transfer value. 
+We use $h$ and $nh$ for lists
 of continuing (``\underline{h}opeful'') candidates, and $e$ and $ne$ for lists of
 \underline{e}lected candidates.
 A \underline{b}ack\underline{l}og is a
@@ -317,8 +314,7 @@ The prefix ``$n$'' always stands for ``new'',
 thus $\mathit{ne}$ is the list of elected candidates in the post state,
 after an action has been applied.
 
-Suppose $ba \in\mathcal{B}$, and $bl , h, e, w \in$\marginpar{Surely,
-  $ba\subseteq \mathcal{B}$?}
+Suppose that $ba \in \mathsf{List}(\mathcal{B})$, and $bl , h, e, w \in$
 \textsf{List}($\mathcal{C}$) are given. Assume $t$ is a
 function from $\mathcal{C}$ into $\mathbb{Q}$, and $p$ is a function
 from $\mathcal{C}$ into \textsf{List}($\mathcal{B}$). We use
@@ -419,13 +415,16 @@ Let $\{s: \mathcal{S} \mid s\mbox{ not final}\}$ be the set of
 non-final machine states. We define a function $\mathsf{Measure}:
 \mathcal{S} \to
 \mathbb{N}^5$ as follows. We let
-\begin{small}\textsf{Measure} (\textsf{initial}($ba$)) = (1,0,0,0,0)\end{small}. Suppose $bl$ $=$ $(l_{1},l_{2})$, for some lists $l_{1}$ and $l_{2}$, and for a given candidate $c$, \textsf{flat} (p c) $=$ $l_{c}$. Then\marginpar{What is flat p c ?}
+\begin{small}\textsf{Measure} (\textsf{initial}($ba$)) =
+(1,0,0,0,0)\end{small}. Suppose $bl$ $=$ $(l_{1},l_{2})$, for some
+lists $l_{1}$ and $l_{2}$, and for a given candidate $c$,
+\textsf{flat} (p c) $=$ $l_{c}$ where for a list of lists $l$,  $\mathsf{flat}$ $l$ is the
+concatenation (flattening) of all elements of $l$. Then
 \begin{small}
 \begin{center}
  \textsf{Measure} (\textsf{state} ($ba,t,p,bl,e,h$)) = (0,
  \textsf{length} $h$, $\sum_{d\in l_{2}}^{}$ \textsf{length}
- $l_{c}$,\textsf{length} $l_{1}$,\textsf{length}  $ba$).\marginpar{The
- $\Sigma$ does not make any sense.}
+ $l_{d}$,\textsf{length} $l_{1}$,\textsf{length}  $ba$).
 \end{center}
 \end{small}
 \end{definition}
@@ -433,7 +432,9 @@ non-final machine states. We define a function $\mathsf{Measure}:
 \noindent
 Note that the first component of the co-domain of the measure
 function simply reduces measure from the initial state to any
-intermediate state. In the following, we describe
+intermediate state, and the third component is the sum of the length
+of the ballots cast in favour of eliminated candidates that await
+transfer. In the following, we describe
 the sanity checks for \textbf{transfer} and \textbf{elect} in detail, 
 and leave it to the reader to reconstruct those for the other rules
 from the formal Coq development.
@@ -653,18 +654,18 @@ several concrete instances.
 One specific ``sanity check'', in fact the one that 
 inspired the very term, is the ability to always 
 %be able to
-``progress'' the count. That is, the rules are such that one (more) rule
-is applicable at every stage of the count, and there are no ``dead
-ends''. We have seen that each rule comes with specific\marginpar{This
-passage seems garbled to me.}
-applicability conditions, e.g. no rule other than count may apply if
-there are uncounted ballots, or that all elected candidates shall be
+``progress'' the count. That is, one rule is
+applicable at every state, so that the count will always progress,
+and there are no ``dead ends'', i.e. states of the count that are
+not final but to which no rule is applicable. 
+As an example, no rule other than count may apply if
+there are uncounted ballots (and indeed count must be applicable in
+this situation), or that all elected candidates shall be
 declared winners if the number of candidates marked elected equals
 the number of seats to be filled.  
-
-Here, this \textred{What is ``this''?} is captured by the various applicability conditions that\marginpar{Repetition.}
-are part of the sanity checks outlined above. The key insight is
-that if the sanity check conditions are satisfied, we can always
+The key insight is
+that if the sanity check conditions (and hence the applicability
+conditions) are satisfied, we can always
 progress the count by applying a rule. In a nutshell, the following
 steps are repeated in order:
 \begin{itemize}
@@ -707,6 +708,7 @@ steps are repeated in order:
 %\hspace*{2.3cm} $\bullet$ if not then, eliminate the weakest candidate.\\
 %
 %\end{definition}
+ \noindent
  We realise this order of rule applications in the
  proof of the rule applicability theorem.  We draw upon the local
  rule applicability property, present in the sanity checks
@@ -740,8 +742,10 @@ $\mathsf{input}\mathrel{R_t}\mathsf{output}$.
 % $R_t$, i.e. $\mathsf{input}\mathrel{R_t}\mathsf{output}$.
 % \end{theorem}
 
+\noindent
 Corollary~\ref{measure:reduction} shows that every applicable transition
-$R$ $\in$ $\mathcal{T}$ \textred{$t \in \mathcal{T}$ surely?} reduces the complexity measure. 
+$R_t$, for $t \in \mathcal{T}$, 
+reduces the complexity measure. 
 Theorem~\ref{app} shows that for any non-final machine state,  a
 transition from the set $\mathcal{T}$ is applicable. Jointly, they
 give a termination property that, in
@@ -833,11 +837,22 @@ only ballots included in this parcel according to next
 preferences. Moreover, they compute the fractional transfer value
 based on the length of the last parcel. In short, the last parcel of a
 candidate is the set of votes they received which made them reach or
-exceed the quota to become elected. As a result, we choose to formalise the pile function to assign a list containing some other lists of ballots. Each of these lists of ballots, contains the ballots received by a candidate after each round of application of the count rule. Therefore, we come to identify which exact set of ballots comprise the last parcel of any elected candidate. Consequently, we are able to tailor both the generic transfer and elect rule and instantiations of them in such a way to modularly formalise several STV schemes which use the last parcel effect.
+exceed the quota to become elected. As a result, we choose to
+formalise the pile function to assign a list of lists of ballots to
+every candidate: the element of this list are the ballots that have
+been counted in favour of the candidate at the successive counts.
+This allows us to identify precisely the set of ballots that
+comprise the last parcel of any elected candidate. Consequently, we
+are able to tailor both the generic transfer and elect rule and
+instantiations of them in such a way to modularly formalise several
+STV schemes where last parcel is being used.
 
 
 \textbf{\emph{Parameters.}} 
-We formalise the notions of candidates, the quota, and transition labels parametrically. The parameters are later specified in the modules for each particular STV. For example, each transition label is generically specified to be a function of type {\fontfamily{qcr}\selectfont STV\_States -> STV\_States -> Prop}.  
+We formalise the notions of candidates, the quota, and transition
+labels parametrically. The parameters are later specified in the
+modules for each particular STV. For example, each transition label
+is associated with a relation, that is, a function of type {\fontfamily{qcr}\selectfont STV\_States -> STV\_States -> Prop}.  
 \paragraph{Sanity checks.} 
 Corresponding to each generic transition label, there is a formal definition of the sanity checking. 
 \begin{scriptsize}
@@ -869,21 +884,21 @@ Definition~\ref{elect:check}. Note that the check loosens the
 constraint so that in order for elect rule to apply, we need an
 electable continuing candidate and electing them would not exceed
 the number of vacancies. This allows us to define a concrete
-elect transition for e.g. CADE STV \cite{DBLP:conf/cade/BeckertGS13} which elects only one candidate who has reached or exceeded the quota, rather than electing all of the electable candidates together. Moreover, we are able to formalise other instances of elect transitions which do elect all of the eligible candidates in one step. 
+elect transition for e.g. CADE STV \cite{Beckert:2013:AVC} which elects only one candidate who has reached or exceeded the quota, rather than electing all of the electable candidates together. Moreover, we are able to formalise other instances of elect transitions which do elect all of the eligible candidates in one step. 
 
 
 \paragraph{Generic STV record.} We bundle the generic quota,  transition labels and the evidence that the generic transitions satisfy the sanity checks in one record type named {\fontfamily{qcr}\selectfont STV\_record}. For example, one field of {\fontfamily{qcr}\selectfont STV\_record} is the requirement that the generic elect transition meets the constraints of the elect sanity check, which technically means ({\fontfamily{qcr}\selectfont Elect\_sanity\_check (elect)}) $\in$ {\fontfamily{qcr}\selectfont STV\_record}. 
 
 
 Finally, we formally prove all of the mathematical properties discussed under the previous section for any {\fontfamily{qcr}\selectfont stv} of type {\fontfamily{qcr}\selectfont STV\_record}. In particular, we demonstrate the termination property. The termination theorem is instantiated in separate modules with particular {\fontfamily{qcr}\selectfont STV\_record} values, such as ACT STV and CADE STV, to obtain termination property for them as well and carry provably correct computations upon programme extraction into Haskell.
-\section{Modular Formalisation of Some STV Machines}
+\section{Modular Formalisation of Some STV Systems}
 We already have discussed some points where STV schemes diverge from one another. They mainly vary in their specification of formal votes, quota, what is the surplus of an elected candidate, how many candidates to elect out of all of those who are electable, how to update the transfer value of votes of an elected candidate, how to transfer the surpluses, or how to eliminate a candidate and then distribute their votes among other continuing candidates.
-
+%
 We describe two of the real-world STV schemes we have formalised. 
   
 \subsection{Victoria STV}
 The Australian state of Victoria employs a version of
-STV~\cite{ofVictoria:2002:EA} for  electing upper house representatives. 
+STV~\cite{PV:2002:EA} for  electing upper house representatives. 
 %There are some particularities about this STV, all of which we have realised in our work, but our demonstrative intentions only need to elaborate on a few properties related to electing and transferring elected surpluses.
 %\begin{enumerate}
 %\item[a.] The transfer value of ballots of an elected candidate $c$ is computed by multiplying the current value of each ballot at a fraction according to the following formula  
@@ -942,10 +957,11 @@ elected candidates,
 and insist that the list {\fontfamily{qcr}\selectfont l}  of elected
 candidates in this state and 
 the old list {\fontfamily{qcr}\selectfont e} of elected candidates together form a
-permutation of {\fontfamily{qcr}\selectfont ne}. The choice
-for\marginpar{I could not understand ``choice for permutation''?}
-permutation carries further details which realise other parts of the
-protocol, which we leave to the reader. 
+permutation of {\fontfamily{qcr}\selectfont ne}. Insisting that the
+new (combined) lists of winners are a permutation of
+{\fontfamily{qcr}\selectfont l} and {\fontfamily{qcr}\selectfont e}
+combined also imply that no new candidates are introduced, or
+candidates are duplicated. 
 
 Next, we describe how the updated pile of an elected candidate in {\fontfamily{qcr}\selectfont Victoria\_Elect} is transferred by Victoria's transfer-elect transition.       
 Figure~\ref{fig;fig.4} illustrates the instantiation of the generic
@@ -978,7 +994,7 @@ surplus is distributed} at the fractional value computed in
 %\vspace*{-0.5cm}
 \subsection{Australian Capital Territory STV}
 Lower house elections in the Australian Capital Territory (ACT) use a version of
-STV~\cite{Assembly:1994:AEP} which stands out for
+STV~\cite{ALA:1994:AEP} which stands out for
 some of its characteristics, including transfer of the ``last parcel''
 of votes and the formulation of transfer value.  The 
 specification of the elect transition of ACT STV is similar to the
@@ -1008,7 +1024,7 @@ replaced by the following:\\
 \noindent
 Moreover, the ACT version of transfer-elected is as in 
 Figure~\ref{fig;fig.4} except that the fist conjunct in Line 5 is
-replaced by a different proposition and reads \texttt{nba = last
+replaced and reads \texttt{nba = last
 (p c)}. 
 The two variations together tell us that we only transfer the last parcel of the elected candidate and the transfer value equals the surplus votes of this candidate divided by the sum of fractional values of this last parcel, rather than the tally of the elected candidate.  
 
@@ -1052,34 +1068,45 @@ algorithm~\cite{Improvements:2015:EVC}, makes explicit modifications to ensure n
 \end{small}
 
 We use the built-in mechanisms of Coq to  extract executable Haskell
-programs for each module. The automatic extraction  method provides a
-sufficient degree of  verification that the executable behaves in
-accordance to its Coq formalisation.\marginpar{This is patently
-  false!} Correctness proofs established in the Coq therefore extend
-to the executables. 
+programs for each module. The automatic extraction  method provides
+very high assurance that the executable behaves in
+accordance to its Coq formalisation.
+Correctness proofs established in the Coq therefore give functional
+correctness of the 
+executables. 
 However, each execution of the extracted program generates a
 run-time certificate, providing independently checkable evidence
 of the underlying computation.
 
 
 \noindent
-Theorem~\ref{termination} guarantees that for each run of the
-program\marginpar{Lots of repetition here.}
-a \textred{?formal?} certificate exists. Moreover, the theorem
-guarantees that the \textred{formal} certificate is the sequence of
+Theorem~\ref{termination} guarantees each run of the program
+produces \emph{formal} certificate, i.e. a sequence of states of the
+count that are linked by rules, as an element of an inductive data
+type. (This contrasts with what one may call an \emph{concrete}
+certificate which would be a file that comprises a textual
+representation of the formal certificate.)
+Moreover, the theorem
+guarantees that the formal certificate is the sequence of
 computation  performed in the execution to obtain the final result. To
-produce a concrete certificate, upon each execution of extracted
-Haskell programmes, \marginpar{Delete red words?} we visualise this \textred{formal} sequence of machine states and transitions \textred{which we have encountered}  from the input to reach to the end result.
+produce a concrete certificate from an execution of extracted
+Haskell programme, we need to agree on textual representations for
+the elements of the data types concerned. 
 
-The certificate generated for each input proves \textgreen{?how?} \marginpar{Where is
-  the theorem that says correct certificate implies correct result?} the correctness of the
-count to the general public, without having to trust the programmer, 
-their own understanding of legal texts, the extraction means used, nor
-any underlying hardware. 
+The certificate generated for each input witnesses 
+the correctness of the
+count. Note that it is trivial to demonstrate that the existence of
+a correct certificate implies the correctness of the result, as the
+latter is defined precisely as being obtained through a sequence of
+correct rule applications. 
+Certificate correctness can be checked by anyone, without \emph{any}
+trust in the means that were used in the production of the
+certificate, or the underlying hardware. 
 %It can be \emph{scrutinised by anyone} for its conformity with the STV counting algorithm employed to tally election votes. 
-Checkability of the \textred{?visualised?} certificate by \emph{any
-  scrutineers} witnesses that our tallying technique satisfies the
-count-as-recorded subproperty of universal verifiability. Thus any
+The fact that concrete certificates can be checked by scrutineers
+means that 
+our tallying technique satisfies the
+count-as-recorded property of universal verifiability. Thus any
 election protocol designed for STV schemes which requires a proof of tallying correctness can utilize our tool.
 
  Figure~\ref{fig;figure5} illustrates an example of a concrete
@@ -1087,7 +1114,7 @@ election protocol designed for STV schemes which requires a proof of tallying co
  seat. We discuss certification only briefly as it is described elsewhere~\cite{Ghale:2017:FVS}.
  We use exact fractions for
  computations to avoid the rounding issues explained
- elsewhere~\cite{DBLP:conf/voteid/GoreL16}.
+ in~\cite{DBLP:conf/voteid/GoreL16}.
  Every line shows six components, each 
  corresponding to an abstract data representation of the intermediate
  states of the abstract  machine: the 
@@ -1109,8 +1136,8 @@ election protocol designed for STV schemes which requires a proof of tallying co
  
  We have evaluated the efficiency of our approach by testing the
  extracted module for the lower house ACT STV on some real elections
- held in 2006\marginpar{Why does
-   the figure say 2008 and 2012?}  and 2008 (Figure~\ref{ref;figure6}). The Molonglo
+ held in 2008
+ and 2012 (Figure~\ref{ref;figure6}). The Molonglo
  electorate of ACT is the biggest lower house electorate in
  Australia, both in the number of vacancies and the number of voters. The extracted
  program computes the result in just 22 minutes.  \begin{small}
@@ -1135,11 +1162,11 @@ Molonglo&$91534$&$7$&$27$&$664$&208.4&2012\\
 \end{small}  
 \section{A Technical Discussion}
 We have introduced a framework for formalisation, verification,
-and\marginpar{This requires significant improvements as it rambles.}
-provably correct computation with various STV algorithms. Our
-software is the outcome of macro level design decisions which we
-made prior to the \textred{implementation???}. In the architecture, we have been
-attentive to  balancing out between different standards for
+and
+provably correct computation with various STV algorithms. In the
+design decisions that we made, 
+we have been 
+balancing different aspects for
 designing a framework. The modular design allows for a much simpler
 implementation than made possibly by other frameworks (e.g.
 \cite{Ghale:2017:FVS}) as we only need to discharge proofs at a
@@ -1157,11 +1184,11 @@ Every instance of STV satisfying the sanity checks enjoys the
 rule applicability and termination properties established in
 Theorems~\ref{app} and~\ref{termination}. Therefore, for an instance
 of STV to be verified, we simply need to 
-discharge\marginpar{What does  discharge mean here?} 
-the sanity checks, rather than duplicate the whole proof process again. These checks
+establish that the sanity checks hold, 
+rather than duplicate the whole proof process. These checks
 offer an abstraction on the algorithmic side which helps us
-avoid\marginpar{duplication twice?}
-duplication of encoding. Unlike previous work, users do
+avoid
+duplication of code. Unlike previous work, users do
 not need to know how the application  and termination theorems have been
 proved in order to show termination of their particular instance. Additionally, separation into modules
 further improves usability. Anyone seeking a verified implementation of
@@ -1195,26 +1222,27 @@ correctness properties of the program, including termination. HOL4 is
 able to execute the ML encoding within reasonable time bounds for
 small elections, but not for large ones. But there is a gap between
 the HOL4 semantics of ML and those used by ML compilers. This gap
-could be closed by re-encoding the ML program into the CakeML verified
-compiler~\cite{cakeml} to produce a fully verified ML program, but has
-not been done to date.
+could be closed by re-encoding HOL terms into CakeML and then using
+CakeML's deep embedding to produce a verified executable
+\cite{POPL14}, but this
+has not been done to date. 
 
-Pattinson and Sh\"urmann~\cite{DBLP:conf/ausai/PattinsonS15}, and
+Pattinson and Sch\"urmann~\cite{DBLP:conf/ausai/PattinsonS15}, and
 Verity and Pattinson~\cite{DBLP:conf/acsw/VerityP17} formalise a
 simple version of STV and first-past-the-post elections in Coq and
 prove properties such as termination and the existence of winners.
 Then they extract certifying executables in Haskell which can handle
 real-world elections. Their crucial contribution is that their
 executable code produces a certificate for every run, which can be
-idependently verified. \textred{Do they prove that a correct
-  certificate implies a correct result?}
+idependently verified. 
 
 Pattinson and Tiwari~\cite{DBLP:conf/itp/PattinsonT17} extend this
-method to tackle the Schultz method~\cite{schulze-method}.  Their extracted code handles
+method to tackle the Schultz method.  Their extracted code handles
 real-world election and also outputs a certificate for every run.
 The certificate not only witnesses how the winner was elected, but also
 provides concrete evidence that each losing candidate is a ``loser''.
 
+\iffalse
 Dawson et al~\cite{DBLP:conf/voteid/DawsonGM15} formalise a version of
 Hare-Clark in the theorem prover HOL~\cite{hol4}. Their specification
 is expressed in the Higher-Order-Logic. Moreover, they encode
@@ -1228,12 +1256,113 @@ encoding would behave according to the original HOL definitions,
 simply because of semantic differences of HOL and SML. Therefore,
 their verification does not legitimately extend beyond HOL to the SML
 programme.
-
+\fi
 \section{Conclusion}
 We have designed a modular framework for formalisation, verification, 
 and provably correct computation of STV algorithms. Our work
 is fully formalised, provides an encoding and provably correct
 executables for various flavours of STV. 
 \bibliographystyle{splncs03}
-\bibliography{paper,delta2,ev}
+%\bibliography{paper,delta2,ev}
+
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+
+\bibitem{ALA:1994:AEP}
+{ACT Legislative Assembly}: An act to entrench the principles of the
+  proportional representation (hare-clark) electoral system (1994)
+
+\bibitem{Beckert:2013:AVC}
+Beckert, B., Gor{\'{e}}, R., Sch{\"{u}}rmann, C.: Analysing vote counting
+  algorithms via logic - and its application to the {CADE} election scheme. In:
+  Bonacina, M.P. (ed.) Proc. CADE 2013. Lecture Notes in Computer Science, vol.
+  7898, pp. 135--144. Springer (2013)
+
+\bibitem{Bertot:2004:ITP}
+Bertot, Y., Cast{\'e}ran, P., Huet, G., Paulin-Mohring, C.: Interactive theorem
+  proving and program development : Coq'Art : the calculus of inductive
+  constructions. Texts in Theoretical Computer Science, Springer (2004)
+
+\bibitem{DBLP:journals/iacr/CortierGKMT16}
+Cortier, V., Galindo, D., K{\"{u}}sters, R., M{\"{u}}ller, J., Truderung, T.:
+  Verifiability notions for e-voting protocols. {IACR} Cryptology ePrint
+  Archive  2016,  287 (2016)
+
+\bibitem{DBLP:conf/voteid/DawsonGM15}
+Dawson, J.E., Gor{\'{e}}, R., Meumann, T.: Machine-checked reasoning about
+  complex voting schemes using higher-order logic. In: Proc. EVote-ID 2015. pp.
+  142--158 (2015)
+
+\bibitem{DeYoung:2012:LLV}
+DeYoung, H., Sch{\"{u}}rmann, C.: Linear logical voting protocols. In: Kiayias,
+  A., Lipmaa, H. (eds.) Proc. VoteID 2011. Lecture Notes in Computer Science,
+  vol. 7187, pp. 53--70. Springer (2012)
+
+\bibitem{Droop:1881:MER}
+Droop, H.R.: On methods of electing representatives. Journal of the Statistical
+  Society of London  44(2),  141--202 (1881)
+
+\bibitem{Ghale:2017:FVS}
+Ghale, M.K., Gor{\'{e}}, R., Pattinson, D.: A formally verified single
+  transferable voting scheme with fractional values. In: Krimmer, R., Volkamer,
+  M., Binder, N.B., Kersting, N., Pereira, O., Sch{\"{u}}rmann, C. (eds.) Proc.
+  E-Vote-ID 2017. Lecture Notes in Computer Science, vol. 10615, pp. 163--182.
+  Springer (2017)
+
+\bibitem{DBLP:journals/apal/Girard93}
+Girard, J.: On the unity of logic. Ann. Pure Appl. Logic  59(3),  201--217
+  (1993)
+
+\bibitem{DBLP:conf/voteid/GoreL16}
+Gor{\'{e}}, R., Lebedeva, E.: Simulating {STV} hand-counting by computers
+  considered harmful: {A.C.T}. In: Proc. EVote-ID 2016. pp. 144--163 (2016)
+
+\bibitem{Trust:2018:AT}
+{John Muir Trust}: Apply to be a trustee (2018),
+  \url{https://www.johnmuirtrust.org/assets/000/002/860/\\How\_to\_apply\_to\_be\_a\_Trustee\_Jan\_2018\_original.pdf},
+  accessed May 15, 2018
+
+\bibitem{POPL14}
+Kumar, R., Myreen, M.O., Norrish, M., Owens, S.: {CakeML}: A verified
+  implementation of {ML}. In: Principles of Programming Languages ({POPL}). ACM
+  (Jan 2014)
+
+\bibitem{Letouzey:2003:NEC}
+Letouzey, P.: A new extraction for {Coq}. In: Geuvers, H., Wiedijk, F. (eds.)
+  Proc. TYPES 2002. Lecture Notes in Computer Science, vol. 2646, pp. 200--219.
+  Springer (2003)
+
+\bibitem{DBLP:conf/ausai/PattinsonS15}
+Pattinson, D., Sch{\"{u}}rmann, C.: Vote counting as mathematical proof. In:
+  {AI} 2015: Advances in Artificial Intelligence - 28th Australasian Joint
+  Conference. pp. 464--475 (2015)
+
+\bibitem{DBLP:conf/itp/PattinsonT17}
+Pattinson, D., Tiwari, M.: Schulze voting as evidence carrying computation. In:
+  Proc. ITP 2017. pp. 410--426 (2017)
+
+\bibitem{DBLP:conf/cade/Schack-NielsenS08}
+Schack{-}Nielsen, A., Sch{\"{u}}rmann, C.: Celf - {A} logical framework for
+  deductive and concurrent systems (system description). In: Proc. IJCAR 2008.
+  pp. 320--326 (2008)
+
+\bibitem{Improvements:2015:EVC}
+{Software Improvements}: Electronic and voting and counting sytems.
+  http://www.softimp.com.au/evacs/index.html (2015), accessed at May 12, 2015
+
+\bibitem{StackExchange:2018:ME}
+StackExchange: Moderator elections (2018),
+  \url{https://math.stackexchange.com/\\election/6?tab=election}, accessed May
+  15, 2018
+
+\bibitem{PV:2002:EA}
+{The Parliament of Victoria}: Electoral act 2002 (2002), see also
+  https://www.elections.act.gov.au/education/act\_electoral\_commission\_fact\_sheets/fact\_sheets\_-\_general\_html/elections\_act\_factsheet\_hare-clark\_electoral\_system
+
+\bibitem{DBLP:conf/acsw/VerityP17}
+Verity, F., Pattinson, D.: Formally verified invariants of vote counting
+  schemes. In: Proc. ACSW 2017. pp. 31:1--31:10 (2017)
+
+\end{thebibliography}
 \end{document}
