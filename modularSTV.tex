@@ -421,7 +421,7 @@ non-final machine states. We define a function $\mathsf{Measure}:
 \begin{small}\textsf{Measure} (\textsf{initial}($ba$)) =
 (1,0,0,0,0)\end{small}. Suppose $bl$ $=$ $(l_{1},l_{2})$, for some
 lists $l_{1}$ and $l_{2}$, and for a given candidate $c$,
-\textsf{flat} (p c) $=$ $l_{c}$ where for a list of lists $l$,  $\mathsf{flat}$ $l$ is the
+\textsf{flat} (p c) $=$ $l_{c}$ where for a list $l$ of lists,  $\mathsf{flat}$ $l$ is the
 concatenation (flattening) of all elements of $l$. Then
 \begin{small}
 \begin{center}
@@ -893,7 +893,15 @@ elect transition for e.g. CADE STV \cite{Beckert:2013:AVC} which elects only one
 \paragraph{Generic STV record.} We bundle the generic quota,  transition labels and the evidence that the generic transitions satisfy the sanity checks in one record type named {\fontfamily{qcr}\selectfont STV\_record}. For example, one field of {\fontfamily{qcr}\selectfont STV\_record} is the requirement that the generic elect transition meets the constraints of the elect sanity check, which technically means ({\fontfamily{qcr}\selectfont Elect\_sanity\_check (elect)}) $\in$ {\fontfamily{qcr}\selectfont STV\_record}. 
 
 
-Finally, we formally prove all of the mathematical properties discussed under the previous section for any {\fontfamily{qcr}\selectfont stv} of type {\fontfamily{qcr}\selectfont STV\_record}. In particular, we demonstrate the termination property. The termination theorem is instantiated in separate modules with particular {\fontfamily{qcr}\selectfont STV\_record} values, such as ACT STV and CADE STV, to obtain termination property for them as well and carry provably correct computations upon programme extraction into Haskell.
+Finally, we formally prove all of the mathematical properties
+discussed under the previous section for any
+{\fontfamily{qcr}\selectfont stv} of type
+{\fontfamily{qcr}\selectfont STV\_record}. In particular, we
+demonstrate the termination property. The termination theorem is
+instantiated in separate modules with particular
+{\fontfamily{qcr}\selectfont STV\_record} values, such as ACT STV
+and CADE STV, to obtain termination property for them as well and
+carry provably correct computations upon program extraction into Haskell.
 \section{Modular Formalisation of Some STV Systems}
 We already have discussed some points where STV schemes diverge from one another. They mainly vary in their specification of formal votes, quota, what is the surplus of an elected candidate, how many candidates to elect out of all of those who are electable, how to update the transfer value of votes of an elected candidate, how to transfer the surpluses, or how to eliminate a candidate and then distribute their votes among other continuing candidates.
 %
@@ -963,8 +971,8 @@ the old list {\fontfamily{qcr}\selectfont e} of elected candidates together form
 permutation of {\fontfamily{qcr}\selectfont ne}. Insisting that the
 new (combined) lists of winners are a permutation of
 {\fontfamily{qcr}\selectfont l} and {\fontfamily{qcr}\selectfont e}
-combined also imply that no new candidates are introduced, or
-candidates are duplicated. 
+combined also imply that no new candidates are introduced, no
+existing candidates are deleted, and there is no duplication. 
 
 Next, we describe how the updated pile of an elected candidate in {\fontfamily{qcr}\selectfont Victoria\_Elect} is transferred by Victoria's transfer-elect transition.       
 Figure~\ref{fig;fig.4} illustrates the instantiation of the generic
@@ -1084,7 +1092,7 @@ of the underlying computation.
 
 \noindent
 Theorem~\ref{termination} guarantees each run of the program
-produces \emph{formal} certificate, i.e. a sequence of states of the
+produces a \emph{formal} certificate, i.e. a sequence of states of the
 count that are linked by rules, as an element of an inductive data
 type. (This contrasts with what one may call an \emph{concrete}
 certificate which would be a file that comprises a textual
@@ -1093,7 +1101,7 @@ Moreover, the theorem
 guarantees that the formal certificate is the sequence of
 computation  performed in the execution to obtain the final result. To
 produce a concrete certificate from an execution of extracted
-Haskell programme, we need to agree on textual representations for
+Haskell program, we need to agree on textual representations for
 the elements of the data types concerned. 
 
 The certificate generated for each input witnesses 
@@ -1110,7 +1118,8 @@ The fact that concrete certificates can be checked by scrutineers
 means that 
 our tallying technique satisfies the
 count-as-recorded property of universal verifiability. Thus any
-election protocol designed for STV schemes which requires a proof of tallying correctness can utilize our tool.
+election protocol designed for STV schemes which requires a proof of
+tallying correctness can use our tool.
 
  Figure~\ref{fig;figure5} illustrates an example of a concrete
  certificate, where candidates a, b, and c are competing for one
@@ -1166,7 +1175,8 @@ Molonglo&$91534$&$7$&$27$&$664$&208.4&2012\\
 \section{A Technical Discussion}
 We have introduced a framework for formalisation, verification, and provably correct computation with various STV algorithms. In the design decisions that we made, 
 we have been  balancing different aspects for
-designing a framework. The modular design allows for a much simpler implementation than made possibly by other frameworks (e.g.
+designing a framework. The modular design allows for a much simpler
+realisation than made possibly by other frameworks (e.g.
 \cite{Ghale:2017:FVS}) as we only need to discharge proofs at a
 per-rule basis which is also reflected in the fact that (a) we capture realistic voting protocols, and (b) we can accommodate a larger number of protocols with ease. 
 %\begin{small}
