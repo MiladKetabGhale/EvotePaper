@@ -21,11 +21,13 @@
 %\usepackage{caption}
 %\usepackage{eeesubcaption}
 \title{Modular Formalisation and Verification of \\STV Algorithms}
-\author{Milad~K.~Ghale\and
-        Rajeev~Gor\'e\and
-        Dirk~Pattinson\and
-        Mukesh Tiwari}
-\institute{The Australian National University}
+\author{Milad~K.~Ghale \orcidID{0000-0002-1895-9477}
+   \and Rajeev~Gor\'e
+   \and Dirk~Pattinson \orcidID{0000-0002-5832-6666}
+   \and Mukesh Tiwari \orcidID{0000-0001-5373-9659}}
+\institute{The Australian National University
+\email{\{milad.ketabghale,rajeev.gore,dirk.pattinson,mukesh.tiwari\}@anu.edu.au}
+}
 \begin{document}
 \maketitle
 \pagestyle{plain}
@@ -365,7 +367,7 @@ the process; and\\
 
 \smallskip\noindent
 For the moment, we treat the above as transition labels only, and
-provide semantical meaning in the next section.
+provide semantic meaning in the next section.
 
 \begin{definition}[machine transitions]\label{stv:trans}
 The set $\mathcal{T}$ consisting of the labels \textbf{count}, \textbf{elect}, \textbf{transfer-elected}, \textbf{transfer-removed}, \textbf{eliminate}, \textbf{hopeful win}, and \textbf{elected win}, is the set of transition labels of the generic STV.
@@ -390,7 +392,7 @@ reduces the size of at least one of the following four
 objects: the list of continuing candidates; the number of 
 ballots in the pile of the most recently eliminated candidate;  the
 backlog; and the list of uncounted ballots. Using lexicographic
-ordering, this allows us to define a 
+ordering, this allows us to define 
 a complexity measure on the set of
 machine states in such a way that each rule application reduces this
 measure. 
@@ -421,7 +423,7 @@ non-final machine states. We define a function $\mathsf{Measure}:
 \begin{small}\textsf{Measure} (\textsf{initial}($ba$)) =
 (1,0,0,0,0)\end{small}. Suppose $bl$ $=$ $(l_{1},l_{2})$, for some
 lists $l_{1}$ and $l_{2}$, and for a given candidate $c$,
-\textsf{flat} (p c) $=$ $l_{c}$ where for a list of lists $l$,  $\mathsf{flat}$ $l$ is the
+\textsf{flat} (p c) $=$ $l_{c}$ where for a list $l$ of lists,  $\mathsf{flat}$ $l$ is the
 concatenation (flattening) of all elements of $l$. Then
 \begin{small}
 \begin{center}
@@ -443,7 +445,7 @@ and leave it to the reader to reconstruct those for the other rules
 from the formal Coq development.
 
 \paragraph{Transfer-elected check.} The
-\emph{transfer-elected}  rule that decribes the transfer
+\emph{transfer-elected}  rule that describes the transfer
 of surplus votes of an elected candidate 
 must satisfy two conditions. The applicability condition
 asserts that transfer-elected is applicable to 
@@ -497,7 +499,7 @@ $<$ \textsf{length}($bl$) (i.e. the backlog is reduced).
 The following is immediate from the definition of measure
 (Definition \ref{defn:measure}):
 \begin{theorem}\label{trans:red}
-If transition label $R$ obeys the reducability
+If transition label $R$ obeys the reducibility
 condition of Definition~\ref{trans:check},
 \textsf{input} $\in\mathcal{S}$, 
 \textsf{output} $\in\mathcal{S}$ and \textsf{input}
@@ -604,7 +606,7 @@ $\mathcal{T}$ that satisfies the corresponding sanity check reduces the complexi
 \subsection{The Generic STV Machine} 
 The sanity checks constrain the computation that may happen on a
 given input state if the corresponding rule is applied. A set of
-rules, each of which satisfies the correspoinding sanity check, can
+rules, each of which satisfies the corresponding sanity check, can
 therefore be seen as a small-step semantics for STV counting. We
 capture this mathematically as a generic machine.
 
@@ -618,7 +620,7 @@ and
 transition labels (Definition~\ref{stv:trans}), respectively. 
 The \emph{generic
 STV machine} is $M = \langle \mathcal{T}, (S_t)_{t \in \mathcal{T}}
-\rangle$ where $S_t$ is the santity check condition 
+\rangle$ where $S_t$ is the sanity check condition 
 % associated with
 for 
 transition $t \in \mathcal{T}$. 
@@ -785,7 +787,7 @@ Instances consist of four parts:
 \begin{itemize}
 \item[1.] instantiations of the generic counting conditions defined in the base, with concrete instances of counting rules of a particular STV schemes
 \item[2.] proofs which establish sanity checks for the instantiated transition rules
-\item[3.] possibly auxilary fuctions specific to the particular
+\item[3.] possibly auxiliary functions specific to the particular
 instance of STV
 \item[4.] an instantiation of the termination theorem which allows
 us to synthesise a provably correct, and certifiable, vote counting
@@ -893,7 +895,15 @@ elect transition for e.g. CADE STV \cite{Beckert:2013:AVC} which elects only one
 \paragraph{Generic STV record.} We bundle the generic quota,  transition labels and the evidence that the generic transitions satisfy the sanity checks in one record type named {\fontfamily{qcr}\selectfont STV\_record}. For example, one field of {\fontfamily{qcr}\selectfont STV\_record} is the requirement that the generic elect transition meets the constraints of the elect sanity check, which technically means ({\fontfamily{qcr}\selectfont Elect\_sanity\_check (elect)}) $\in$ {\fontfamily{qcr}\selectfont STV\_record}. 
 
 
-Finally, we formally prove all of the mathematical properties discussed under the previous section for any {\fontfamily{qcr}\selectfont stv} of type {\fontfamily{qcr}\selectfont STV\_record}. In particular, we demonstrate the termination property. The termination theorem is instantiated in separate modules with particular {\fontfamily{qcr}\selectfont STV\_record} values, such as ACT STV and CADE STV, to obtain termination property for them as well and carry provably correct computations upon programme extraction into Haskell.
+Finally, we formally prove all of the mathematical properties
+discussed under the previous section for any
+{\fontfamily{qcr}\selectfont stv} of type
+{\fontfamily{qcr}\selectfont STV\_record}. In particular, we
+demonstrate the termination property. The termination theorem is
+instantiated in separate modules with particular
+{\fontfamily{qcr}\selectfont STV\_record} values, such as ACT STV
+and CADE STV, to obtain termination property for them as well and
+carry provably correct computations upon program extraction into Haskell.
 \section{Modular Formalisation of Some STV Systems}
 We already have discussed some points where STV schemes diverge from one another. They mainly vary in their specification of formal votes, quota, what is the surplus of an elected candidate, how many candidates to elect out of all of those who are electable, how to update the transfer value of votes of an elected candidate, how to transfer the surpluses, or how to eliminate a candidate and then distribute their votes among other continuing candidates.
 %
@@ -943,7 +953,7 @@ Figure~\ref{fig;fig.3}.
 \end{figure}
 \end{scriptsize}
 
-The counting protocol of Victoria STV, defines surpuls votes to be \lq\lq \emph{the number, if any, of votes in excess of the
+The counting protocol of Victoria STV, defines surplus votes to be \lq\lq \emph{the number, if any, of votes in excess of the
 quota of each elected candidate}\rq\rq. Moreover it dictates, under Section 17, Subsection 7 Clause (a), that \lq\lq  \emph{the number of surplus votes of the elected candidate is to be
 divided by the number of first preference votes received by the
 elected candidate and the resulting fraction is the transfer value}\rq\rq. In lines 6 and 7, we compute the surplus vote and the fractional transfer value accordingly and multiply it by the current value of every ballot in the pile of the elected candidate $c$ to update the pile of this candidate. 
@@ -963,8 +973,8 @@ the old list {\fontfamily{qcr}\selectfont e} of elected candidates together form
 permutation of {\fontfamily{qcr}\selectfont ne}. Insisting that the
 new (combined) lists of winners are a permutation of
 {\fontfamily{qcr}\selectfont l} and {\fontfamily{qcr}\selectfont e}
-combined also imply that no new candidates are introduced, or
-candidates are duplicated. 
+combined also imply that no new candidates are introduced, no
+existing candidates are deleted, and there is no duplication. 
 
 Next, we describe how the updated pile of an elected candidate in {\fontfamily{qcr}\selectfont Victoria\_Elect} is transferred by Victoria's transfer-elect transition.       
 Figure~\ref{fig;fig.4} illustrates the instantiation of the generic
@@ -1084,7 +1094,7 @@ of the underlying computation.
 
 \noindent
 Theorem~\ref{termination} guarantees each run of the program
-produces \emph{formal} certificate, i.e. a sequence of states of the
+produces a \emph{formal} certificate, i.e. a sequence of states of the
 count that are linked by rules, as an element of an inductive data
 type. (This contrasts with what one may call a \emph{concrete}
 certificate which would be a file that comprises a textual
@@ -1093,7 +1103,7 @@ Moreover, the theorem
 guarantees that the formal certificate is the sequence of
 computation  performed in the execution to obtain the final result. To
 produce a concrete certificate from an execution of extracted
-Haskell programme, we need to agree on textual representations for
+Haskell program, we need to agree on textual representations for
 the elements of the data types concerned. 
 
 The certificate generated for each input witnesses 
@@ -1110,7 +1120,8 @@ The fact that concrete certificates can be checked by scrutineers
 means that 
 our tallying technique satisfies the
 count-as-recorded property of universal verifiability. Thus any
-election protocol designed for STV schemes which requires a proof of tallying correctness can utilize our tool.
+election protocol designed for STV schemes which requires a proof of
+tallying correctness can use our tool.
 
  Figure~\ref{fig;figure5} illustrates an example of a concrete
  certificate, where candidates a, b, and c are competing for one
@@ -1166,7 +1177,8 @@ Molonglo&$91534$&$7$&$27$&$664$&208.4&2012\\
 \section{A Technical Discussion}
 We have introduced a framework for formalisation, verification, and provably correct computation with various STV algorithms. In the design decisions that we made, 
 we have been  balancing different aspects for
-designing a framework. The modular design allows for a much simpler implementation than made possibly by other frameworks (e.g.
+designing a framework. The modular design allows for a much simpler
+realisation than made possibly by other frameworks (e.g.
 \cite{Ghale:2017:FVS}) as we only need to discharge proofs at a
 per-rule basis which is also reflected in the fact that (a) we capture realistic voting protocols, and (b) we can accommodate a larger number of protocols with ease. 
 %\begin{small}
@@ -1227,7 +1239,16 @@ offer an abstraction on the algorithmic side which helps us
 avoid duplication of code. Unlike previous work, users do
 not need to know how the application  and termination theorems have been proved in order to show termination of their particular instance. Additionally, separation into modules further improves usability. Anyone seeking a verified implementation of their preferred flavour of STV can simply use our framework and instantiate as appropriate. 
 
-Figure~\ref{ref;figure7} illustrates the framework architecture. The parameters component includes type level declaration of candidates, vacancies, and the quota. The base comprises the encoding of the generic STV model along with functions commonly called by the dependent modules. The  instantiation component consists of instantiating types specified in the parameters file and automatically discharging of required proofs. Finally, the instantiated generic model is called into each module for discharging sanity checks and consequently extracting provably correct Hakell programs.
+Figure~\ref{ref;figure7} illustrates the framework architecture. The
+parameters component includes type level declaration of candidates,
+vacancies, and the quota. The base comprises the encoding of the
+generic STV model along with functions commonly called by the
+dependent modules. The  instantiation component consists of
+instantiating types specified in the parameters file and
+automatically discharging of required proofs. Finally, the
+instantiated generic model is called into each module for
+discharging sanity checks and consequently extracting provably
+correct Haskell programs.
    
 
 The ability to just instantiate is significant as many
@@ -1252,7 +1273,9 @@ correctness properties of the program, including termination. HOL4 is
 able to execute the ML encoding within reasonable time bounds for
 small elections, but not for large ones. But there is a gap between
 the HOL4 semantics of ML and those used by ML compilers. This gap
-could be closed by using the proof-producing synthesis~\cite{Myreen} of CakeML code from the HOL assertions, then using the verified CakeML compiler~\cite{POPL14} to porduce the machine code. However, this
+could be closed by using the proof-producing synthesis~\cite{Myreen}
+of CakeML code from the HOL assertions, then using the verified
+CakeML compiler~\cite{POPL14} to produce the machine code. However, this
 has not been done to date. 
 
 Pattinson and Sch\"urmann~\cite{DBLP:conf/ausai/PattinsonS15}, and
@@ -1262,7 +1285,7 @@ prove properties such as termination and the existence of winners.
 Then they extract certifying executables in Haskell which can handle
 real-world elections. Their crucial contribution is that their
 executable code produces a certificate for every run, which can be
-idependently verified. 
+independently verified. 
 
 Pattinson and Tiwari~\cite{DBLP:conf/itp/PattinsonT17} extend this
 method to tackle the Schultz method.  Their extracted code handles
